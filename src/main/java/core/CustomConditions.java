@@ -7,54 +7,61 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static core.Helpers.contains;
+import static core.Helpers.getTexts;
+import static core.Helpers.getVisibleElements;
+
 public class CustomConditions {
 
     public static ExpectedCondition<WebElement> listElementWithCssClass(final By elementsLocator, final String expectedCss) {
         return elementExceptionsCatcher(new ExpectedCondition<WebElement>() {
-            List<WebElement> actualElement;
-            WebElement currentElement;
+            List<WebElement> actualElements;
+            String currentCssClass;
 
             public WebElement apply(WebDriver driver) {
-                actualElement = driver.findElements(elementsLocator);
+                WebElement currentElement;
+                actualElements = driver.findElements(elementsLocator);
 
-                for(int i=0; i < actualElement.size(); i++) {
-                    currentElement = actualElement.get(i);
-                    if (currentElement.getAttribute("class").contains(expectedCss)) {
-                        return currentElement;
+                for(int i=0; i < actualElements.size(); i++) {
+                    currentElement = actualElements.get(i);
+                    currentCssClass = currentElement.getAttribute("class");
+                    if(contains(currentCssClass, expectedCss)) {
+                      return currentElement;
                     }
                 }
                 return null;
             }
 
             public String toString() {
-                return String.format("elements ['%s'] doesn't have element with expected inner CSS selector ['%s'] "
-                        , actualElement.toArray().toString(), expectedCss);
+                return String.format("elements ['%s'] should have CSS class ['%s'], while actual classes are ('%s')  "
+                        , actualElements.toArray().toString(), expectedCss, currentCssClass);
             }
         });
     }
 
-    public static ExpectedCondition<WebElement> listElementWithText(final By elementsLocator, final String expectedText) {
+    public static ExpectedCondition<WebElement> listElementWithExactText(final By elementsLocator, final String expectedText) {
         return elementExceptionsCatcher(new ExpectedCondition<WebElement>() {
             List<WebElement> actualElements;
+            List<String> actualTexts;
 
             public WebElement apply(WebDriver driver) {
                 actualElements = driver.findElements(elementsLocator);
-                for (int i = 0; i < actualElements.size(); i++) {
-                    WebElement currentElement = actualElements.get(i);
-                    if (currentElement.getText().equals(expectedText)) {
-                        return currentElement;
+                actualTexts = getTexts(actualElements);
+                for (int i = 0; i < actualTexts.size(); i++) {
+                    if (actualTexts.get(i).equals(expectedText)) {
+                        return actualElements.get(i);
                     }
                 }
                 return null;
             }
             public String toString() {
-                return String.format("elements of list located ['%s'] doesn't contain element with expected text ['%s']. " +
-                        "Actual texts are: ['%s']",elementsLocator, expectedText, actualElements.toArray().toString());
+                return String.format("elements of list located ['%s'] should have text ['%s']. " +
+                        "Actual texts are: ['%s']",elementsLocator, expectedText, Arrays.toString(actualTexts.toArray()));
             }
         });
     }
 
-    public static ExpectedCondition<List<WebElement>> texts(final By elementsLocator, final String... expectedTexts) {
+    public static ExpectedCondition<List<WebElement>> exactTextOf(final By elementsLocator, final String... expectedTexts) {
         return elementExceptionsCatcher(new ExpectedCondition<List<WebElement>>() {
             private List<String> elementsTexts;
 
@@ -80,28 +87,22 @@ public class CustomConditions {
 
             public String toString() {
                 return String.format("elements of list located ['%s'] should have ('%s') texts, " +
-                        "while actual texts are ('%s')",elementsLocator, elementsTexts.toArray().toString(),
+                                "while actual texts are ('%s')", elementsLocator, Arrays.toString(elementsTexts.toArray()),
                         Arrays.toString(expectedTexts));
             }
         });
     }
 
-    public static ExpectedCondition<List<WebElement>> textsOfVisible(final By elementsLocator, final String... expectedTexts) {
+    public static ExpectedCondition<List<WebElement>> exactTextsOfVisible(final By elementsLocator, final String... expectedTexts) {
         return elementExceptionsCatcher(new ExpectedCondition<List<WebElement>>() {
             private List<String> elementsTexts;
 
             public List<WebElement> apply(WebDriver driver) {
-                elementsTexts = new ArrayList<>();
                 List<WebElement> innerElements = driver.findElements(elementsLocator);
-
-                for (int i = 0; i < innerElements.size(); i++) {
-                    if(innerElements.get(i).isDisplayed()) {
-                        elementsTexts.add(innerElements.get(i).getText());
-                    }
-                }
+                elementsTexts = getTexts(getVisibleElements(innerElements));
 
                 for (int i = 0; i < elementsTexts.size(); i++) {
-                    if (!elementsTexts.get(i).equals(expectedTexts[i])) {
+                    if (!elementsTexts.get(i). equals(expectedTexts[i])) {
                         return null;
                     }
                 }
@@ -118,11 +119,13 @@ public class CustomConditions {
 
     public static  ExpectedCondition<Boolean> sizeOf(final By elementsLocator, final int size) {
         return elementExceptionsCatcher(new ExpectedCondition<Boolean>() {
-            List<WebElement> actualElement;
+            List<WebElement> actualElements;
+            int actualElementsSize = 0;
 
             public Boolean apply(WebDriver driver) {
-                actualElement = driver.findElements(elementsLocator);
-                if (actualElement.size() == size) {
+                actualElements = driver.findElements(elementsLocator);
+                actualElementsSize = actualElements.size();
+                if (actualElementsSize == size) {
                     return true;
                 }
                 return false;
@@ -130,25 +133,21 @@ public class CustomConditions {
 
             public String toString() {
                 return String.format("elements of list located ['%s'] should have size ['%s']. " +
-                        "Actual size is ['%s']",elementsLocator,size , actualElement.size());
+                        "Actual size is ['%s']", elementsLocator, size, actualElementsSize);
             }
         });
     }
 
-    public static  ExpectedCondition<Boolean> sizeVisibleOf(final By elementsLocator, final int size) {
+    public static  ExpectedCondition<Boolean> sizeOfVisible(final By elementsLocator, final int size) {
         return elementExceptionsCatcher(new ExpectedCondition<Boolean>() {
-            List<WebElement> actualElement;
+            List<WebElement> actualElements;
             int elementVisibleCount = 0;
 
             public Boolean apply(WebDriver driver) {
-                actualElement = driver.findElements(elementsLocator);
+                actualElements = driver.findElements(elementsLocator);
 
-                for (int i = 0; i < actualElement.size(); i++) {
-                    if(actualElement.get(i).isDisplayed()) {
-                        elementVisibleCount++;
-                    }
-                }
-
+                List<WebElement> currentVisibleElements = getVisibleElements(actualElements);
+                elementVisibleCount = currentVisibleElements.size();
                 if (elementVisibleCount == size) {
                     return true;
                 }
@@ -177,4 +176,5 @@ public class CustomConditions {
             }
         };
     }
+
 }

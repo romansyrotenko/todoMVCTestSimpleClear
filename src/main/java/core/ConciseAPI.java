@@ -1,7 +1,6 @@
 package core;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -34,12 +33,12 @@ public class ConciseAPI {
         return assertThat(condition, Configuration.timeout);
     }
 
-    public static WebElement $(By elementLocator) {
-        return assertThat(visibilityOfElementLocated(elementLocator));
+    public static WebElement $(ExpectedCondition<WebElement> conditionToWaitElement) {
+        return assertThat(conditionToWaitElement);
     }
 
-    public static WebElement $(ExpectedCondition<WebElement> webElementExpectedCondition) {
-        return assertThat(webElementExpectedCondition);
+    public static WebElement $(By elementLocator) {
+        return $(visibilityOfElementLocated(elementLocator));
     }
 
     public static WebElement $(ExpectedCondition<WebElement> conditionToWaitParentElement, By innerElementLocator) {
@@ -59,17 +58,20 @@ public class ConciseAPI {
     }
 
     public static void doubleClick(WebElement element) {
-        Actions action = new Actions(getDriver());
-        action.doubleClick(element).perform();
+        actions().doubleClick(element).perform();
     }
 
     public static void hover(WebElement element) {
-        Actions action = new Actions(getDriver());
-        action.moveToElement(element).build().perform();
+        actions().moveToElement(element).perform();
     }
 
-    public static void setAttributeValue(WebElement element, String value)  {
-        element.findElement(byCss(".edit")).clear();
-        element.findElement(byCss(".edit")).sendKeys(value + Keys.ENTER);
+    public static WebElement setValue(WebElement element,String specifiedCss, String value)  {
+        element.findElement(byCss(specifiedCss)).clear();
+        element.findElement(byCss(specifiedCss)).sendKeys(value);
+        return element;
+    }
+
+    public static Actions actions() {
+        return new Actions(getDriver());
     }
 }

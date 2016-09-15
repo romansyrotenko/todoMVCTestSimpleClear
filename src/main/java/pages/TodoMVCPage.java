@@ -16,20 +16,20 @@ public class TodoMVCPage {
         open("http://todomvc4tasj.herokuapp.com/");
     }
 
-    public static void addTask(String text) {
-        $(byCss("#new-todo")).sendKeys(text + Keys.ENTER);
+    public static void add(String taskText) {
+        $(byCss("#new-todo")).sendKeys(taskText + Keys.ENTER);
     }
 
-    public static void delete(String text) {
-        hover($(listElementWithText(tasks, text)));
-        $(listElementWithText(tasks, text), ".destroy").click();
+    public static void delete(String taskText) {
+        hover($(listElementWithExactText(tasks, taskText)));
+        $(listElementWithExactText(tasks, taskText), ".destroy").click();
     }
 
-    public static void toggle(String text) {
-        $(listElementWithText(tasks, text), ".toggle").click();
+    public static void toggle(String taskText) {
+        $(listElementWithExactText(tasks, taskText), ".toggle").click();
     }
 
-    public static void clearComplited() {
+    public static void clearCompleted() {
         $(byCss("#clear-completed")).click();
     }
 
@@ -45,16 +45,16 @@ public class TodoMVCPage {
         $(byLinkText("Completed")).click();
     }
 
-    public static void editTask(String oldText, String newText ) {
-        doubleClick($(listElementWithText(tasks, oldText), "label"));
-        setAttributeValue($(listElementWithCssClass(tasks, "editing")), newText);
+    public static void edit(String oldTaskText, String newTaskText) {
+        doubleClick($(listElementWithExactText(tasks, oldTaskText), "label"));
+        setValue($(listElementWithCssClass(tasks, "editing")), ".edit", newTaskText + Keys.ENTER);
     }
 
-    public static void assertTodoCount(int count) {
+    public static void assertItemsLeft(int count) {
         assertThat(ExpectedConditions.textToBe(todoCount, Integer.toString(count)));
     }
 
-    public static void assertInVisibleToDoCount() {
+    public static void assertItemsLeftIsInvisible() {
         assertThat(ExpectedConditions.invisibilityOfElementLocated(todoCount));
     }
 
@@ -62,20 +62,28 @@ public class TodoMVCPage {
         $(byCss("#toggle-all")).click();
     }
 
-    public static void exactTexts(String ... expectedTexts) {
-        assertThat(texts(tasks, expectedTexts));
+    public static void assertTasks(String... expectedTaskTexts) {
+        assertThat(exactTextOf(tasks, expectedTaskTexts));
     }
 
-    public static void exactTextsOfVisible(String ... expectedTexts) {
-        assertThat(textsOfVisible(tasks, expectedTexts));
+    public static void assertVisibleTasks(String... expectedTaskTexts) {
+        assertThat(exactTextsOfVisible(tasks, expectedTaskTexts));
     }
 
     public static void assertTasksSizeOf(int size) {
         assertThat(sizeOf(tasks, size));
     }
 
+    public static void assertNoTasks() {
+        assertTasksSizeOf(0);
+    }
+
     public static void assertVisibleTasksSizeOf(int size) {
-        assertThat(sizeVisibleOf(tasks, size));
+        assertThat(sizeOfVisible(tasks, size));
+    }
+
+    public static void assertNoVisibleTasks() {
+        assertVisibleTasksSizeOf(0);
     }
 
 }

@@ -1,9 +1,8 @@
 import org.junit.Before;
 import org.junit.Test;
-import pages.TodoMVCPage;
 import testconfigs.BaseTest;
 
-import static pages.TodoMVCPage.openApp;
+import static pages.TodoMVCPage.*;
 
 public class ToDoMVCTest extends BaseTest {
 
@@ -14,138 +13,162 @@ public class ToDoMVCTest extends BaseTest {
 
     @Test
     public void testAtAllFilter() {
-
         //create tasks
-        TodoMVCPage.addTask("task 1");
-        TodoMVCPage.addTask("task 2");
-        TodoMVCPage.addTask("task 3");
-        TodoMVCPage.addTask("task 4");
-        TodoMVCPage.exactTexts("task 1", "task 2", "task 3", "task 4");
-        TodoMVCPage.assertTodoCount(4);
+        add("task 1");
+        add("task 2");
+        add("task 3");
+        add("task 4");
+
+        assertTasks("task 1", "task 2", "task 3", "task 4");
+        assertItemsLeft(4);
 
         //delete task
-        TodoMVCPage.delete("task 2");
-        TodoMVCPage.exactTexts("task 1", "task 3", "task 4");
-        TodoMVCPage.assertTodoCount(3);
+        delete("task 2");
+
+        assertTasks("task 1", "task 3", "task 4");
+        assertItemsLeft(3);
 
         //mark task and clear
-        TodoMVCPage.toggle("task 4");
-        TodoMVCPage.clearComplited();
-        TodoMVCPage.exactTexts("task 1", "task 3");
-        TodoMVCPage.assertTodoCount(2);
+        toggle("task 4");
+        clearCompleted();
+
+        assertTasks("task 1", "task 3");
+        assertItemsLeft(2);
 
         //reopen task
-        TodoMVCPage.toggle("task 3");
-        TodoMVCPage.assertTodoCount(1);
-        TodoMVCPage.exactTexts("task 1", "task 3");
-        TodoMVCPage.toggle("task 3");
-        TodoMVCPage.assertTodoCount(2);
-        TodoMVCPage.exactTexts("task 1", "task 3");
+        toggle("task 3");
+
+        assertTasks("task 1", "task 3");
+        assertItemsLeft(1);
+
+        toggle("task 3");
+
+        assertTasks("task 1", "task 3");
+        assertItemsLeft(2);
 
         //edit task
-        TodoMVCPage.editTask("task 1", "task 1 edited");
-        TodoMVCPage.assertTodoCount(2);
-        TodoMVCPage.exactTexts("task 1 edited", "task 3");
+        edit("task 1", "task 1 edited");
+
+        assertTasks("task 1 edited", "task 3");
+        assertItemsLeft(2);
 
         //mark all as completed and clear
-        TodoMVCPage.toggleAll();
-        TodoMVCPage.clearComplited();
-        TodoMVCPage.assertTasksSizeOf(0);
-        TodoMVCPage.assertInVisibleToDoCount();
+        toggleAll();
+        clearCompleted();
+
+        assertNoTasks();
+        assertItemsLeftIsInvisible();
     }
 
     @Test
     public void testAtActiveFilter() {
-
         //Given filtered tasks at active filter
-        TodoMVCPage.addTask("task 1");
-        TodoMVCPage.addTask("task 2");
-        TodoMVCPage.addTask("task 3");
-        TodoMVCPage.toggle("task 2");
-        TodoMVCPage.toggle("task 3");
-        TodoMVCPage.filterActive();
-        TodoMVCPage.exactTextsOfVisible("task 1");
+        add("task 1");
+        add("task 2");
+        add("task 3");
+        toggle("task 2");
+        toggle("task 3");
+        filterActive();
+
+        assertVisibleTasks("task 1");
 
         //Create task
-        TodoMVCPage.addTask("task 4");
-        TodoMVCPage.assertTodoCount(2);
-        TodoMVCPage.exactTextsOfVisible("task 1", "task 4");
-        TodoMVCPage.filterAll();
-        TodoMVCPage.exactTexts("task 1", "task 2", "task 3", "task 4");
+        add("task 4");
+
+        assertVisibleTasks("task 1", "task 4");
+        assertItemsLeft(2);
+
+        filterAll();
+        assertTasks("task 1", "task 2", "task 3", "task 4");
 
         //Delete task
-        TodoMVCPage.filterActive();
-        TodoMVCPage.delete("task 4");
-        TodoMVCPage.assertTodoCount(1);
-        TodoMVCPage.exactTextsOfVisible("task 1");
-        TodoMVCPage.filterAll();
-        TodoMVCPage.exactTexts("task 1", "task 2", "task 3");
+        filterActive();
+        delete("task 4");
+
+        assertVisibleTasks("task 1");
+        assertItemsLeft(1);
+
+        filterAll();
+        assertTasks("task 1", "task 2", "task 3");
 
         //Editing task
-        TodoMVCPage.filterActive();
-        TodoMVCPage.editTask("task 1", "task 1 edited");
-        TodoMVCPage.assertTodoCount(1);
-        TodoMVCPage.exactTextsOfVisible("task 1 edited");
-        TodoMVCPage.filterAll();
-        TodoMVCPage.exactTexts("task 1 edited", "task 2", "task 3");
+        filterActive();
+        edit("task 1", "task 1 edited");
+
+        assertVisibleTasks("task 1 edited");
+        assertItemsLeft(1);
+
+        filterAll();
+        assertTasks("task 1 edited", "task 2", "task 3");
 
         //Remove task via editing to "empty" text
-        TodoMVCPage.filterActive();
-        TodoMVCPage.addTask("task 5");
-        TodoMVCPage.editTask("task 1 edited", "");
-        TodoMVCPage.assertTodoCount(1);
-        TodoMVCPage.exactTextsOfVisible("task 5");
-        TodoMVCPage.filterAll();
-        TodoMVCPage.exactTexts("task 2", "task 3", "task 5");
+        filterActive();
+        add("task 5");
+        edit("task 1 edited", "");
+
+        assertVisibleTasks("task 5");
+        assertItemsLeft(1);
+
+        filterAll();
+        assertTasks("task 2", "task 3", "task 5");
 
         //Mark completed
-        TodoMVCPage.filterActive();
-        TodoMVCPage.addTask("task 6");
-        TodoMVCPage.toggle("task 6");
-        TodoMVCPage.exactTextsOfVisible("task 5");
-        TodoMVCPage.filterCompleted();
-        TodoMVCPage.exactTextsOfVisible("task 2", "task 3", "task 6");
-        TodoMVCPage.filterAll();
-        TodoMVCPage.assertTodoCount(1);
-        TodoMVCPage.exactTexts("task 2", "task 3", "task 5", "task 6");
+        filterActive();
+        add("task 6");
+        toggle("task 6");
+        assertVisibleTasks("task 5");
+        filterCompleted();
+
+        assertVisibleTasks("task 2", "task 3", "task 6");
+
+        filterAll();
+        assertTasks("task 2", "task 3", "task 5", "task 6");
+        assertItemsLeft(1);
     }
 
     @Test
     public void testAtCompletedFilter() {
-
         //Given filtering task at Completed filter
-        TodoMVCPage.addTask("task 1");
-        TodoMVCPage.addTask("task 2");
-        TodoMVCPage.toggle("task 1");
-        TodoMVCPage.toggle("task 2");
-        TodoMVCPage.filterCompleted();
-        TodoMVCPage.exactTextsOfVisible("task 1", "task 2");
+        add("task 1");
+        add("task 2");
+        toggle("task 1");
+        toggle("task 2");
+        filterCompleted();
+
+        assertVisibleTasks("task 1", "task 2");
 
         //Move task from Complited tab to Active tab
-        TodoMVCPage.toggle("task 1");
-        TodoMVCPage.exactTextsOfVisible("task 2");
-        TodoMVCPage.assertTodoCount(1);
-        TodoMVCPage.filterActive();
-        TodoMVCPage.exactTextsOfVisible("task 1");
+        toggle("task 1");
+
+        assertVisibleTasks("task 2");
+        assertItemsLeft(1);
+
+        filterActive();
+        assertVisibleTasks("task 1");
 
         //Clear complited tasks
-        TodoMVCPage.toggleAll();
-        TodoMVCPage.assertTodoCount(0);
-        TodoMVCPage.filterCompleted();
-        TodoMVCPage.exactTextsOfVisible("task 1", "task 2");
-        TodoMVCPage.clearComplited();
-        TodoMVCPage.assertVisibleTasksSizeOf(0);
+        toggleAll();
+        assertItemsLeft(0);
+        filterCompleted();
+
+        assertVisibleTasks("task 1", "task 2");
+
+        clearCompleted();
+        assertNoVisibleTasks();
 
         //Delete task
-        TodoMVCPage.addTask("task 1");
-        TodoMVCPage.addTask("task 2");
-        TodoMVCPage.toggleAll();
-        TodoMVCPage.filterCompleted();
-        TodoMVCPage.delete("task 2");
-        TodoMVCPage.exactTextsOfVisible("task 1");
-        TodoMVCPage.filterActive();
-        TodoMVCPage.assertVisibleTasksSizeOf(0);
-        TodoMVCPage.filterAll();
-        TodoMVCPage.exactTextsOfVisible("task 1");
+        add("task 1");
+        add("task 2");
+        toggleAll();
+        filterCompleted();
+        delete("task 2");
+
+        assertVisibleTasks("task 1");
+
+        filterActive();
+        assertNoVisibleTasks();
+
+        filterAll();
+        assertVisibleTasks("task 1");
     }
 }
