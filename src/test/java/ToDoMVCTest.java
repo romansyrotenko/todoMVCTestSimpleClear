@@ -47,9 +47,9 @@ public class ToDoMVCTest extends BaseTest {
         assertItemsLeft(2);
 
         //edit task
-        edit("task 1", "task 1 edited");
+        edit("task 3", "task 3 edited");
 
-        assertTasks("task 1 edited", "task 3");
+        assertTasks("task 1", "task 3 edited");
         assertItemsLeft(2);
 
         //mark all as completed and clear

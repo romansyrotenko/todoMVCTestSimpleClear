@@ -6,6 +6,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static core.ConciseAPI.*;
 import static core.CustomConditions.*;
+import static org.openqa.selenium.support.ui.ExpectedConditions.textToBe;
 
 public class TodoMVCPage {
 
@@ -47,11 +48,11 @@ public class TodoMVCPage {
 
     public static void edit(String oldTaskText, String newTaskText) {
         doubleClick($(listElementWithExactText(tasks, oldTaskText), "label"));
-        setValue($(listElementWithCssClass(tasks, "editing")), ".edit", newTaskText + Keys.ENTER);
+        setValue($(listElementWithCssClass(tasks, "editing"), ".edit"), newTaskText + Keys.ENTER);
     }
 
     public static void assertItemsLeft(int count) {
-        assertThat(ExpectedConditions.textToBe(todoCount, Integer.toString(count)));
+        assertThat(textToBe(todoCount, Integer.toString(count)));
     }
 
     public static void assertItemsLeftIsInvisible() {
@@ -62,28 +63,28 @@ public class TodoMVCPage {
         $(byCss("#toggle-all")).click();
     }
 
-    public static void assertTasks(String... expectedTaskTexts) {
-        assertThat(exactTextOf(tasks, expectedTaskTexts));
+    public static void assertTasks(String... taskTexts) {
+        assertThat(exactTextOf(tasks, taskTexts));
     }
 
-    public static void assertVisibleTasks(String... expectedTaskTexts) {
-        assertThat(exactTextsOfVisible(tasks, expectedTaskTexts));
+    public static void assertVisibleTasks(String... taskTexts) {
+        assertThat(exactTextsOfVisible(tasks, taskTexts));
     }
 
-    public static void assertTasksSizeOf(int size) {
+    public static void assertSizeOfTasks(int size) {
         assertThat(sizeOf(tasks, size));
     }
 
     public static void assertNoTasks() {
-        assertTasksSizeOf(0);
+        assertSizeOfTasks(0);
     }
 
-    public static void assertVisibleTasksSizeOf(int size) {
+    public static void assertSizeOfVisibleTasks(int size) {
         assertThat(sizeOfVisible(tasks, size));
     }
 
     public static void assertNoVisibleTasks() {
-        assertVisibleTasksSizeOf(0);
+        assertSizeOfVisibleTasks(0);
     }
 
 }

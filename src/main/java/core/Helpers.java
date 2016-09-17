@@ -7,10 +7,28 @@ import java.util.List;
 
 public class Helpers {
 
-    public static boolean contains(String currentString, String expectedCss) {
-        String[] arr = currentString.split("\\s");
+    public static boolean isWordContainedInPhrase(String phrase, String word) {
+        String[] arr = phrase.split("\\s");
+
+//        List<String> arr2 = new ArrayList<>();
+//        for (int i = 0; i < arr.length; i++) {
+//            arr2.add(arr[i]);
+//        }
+
         for(int i = 0; i < arr.length; i++) {
-            if (expectedCss.equals(arr[i])) {
+            if (word.equals(arr[i])) {
+                return true;
+            }
+        }
+        return false;
+
+ //       return isContainedInList(arr2, word);
+
+    }
+
+    public static boolean isContainedInList(List<String> list, String... texts) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).equals(texts[i])) {
                 return true;
             }
         }

@@ -65,9 +65,9 @@ public class ConciseAPI {
         actions().moveToElement(element).perform();
     }
 
-    public static WebElement setValue(WebElement element,String specifiedCss, String value)  {
-        element.findElement(byCss(specifiedCss)).clear();
-        element.findElement(byCss(specifiedCss)).sendKeys(value);
+    public static WebElement setValue(WebElement element, String value)  {
+        element.clear();
+        element.sendKeys(value);
         return element;
     }
 
