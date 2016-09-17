@@ -16,6 +16,6 @@ public class BaseTest {
 
     @After
     public void closeDriver() {
-        getDriver(Thread.currentThread().toString()).quit();
+        getDriver(Thread.currentThread()).quit();
     }
 }

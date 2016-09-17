@@ -14,23 +14,22 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElem
 
 public class ConciseAPI {
 
-    private static Map<String, WebDriver> webDriverMap = new HashMap<>();
+    private static Map<Thread, WebDriver> webDriverMap = new HashMap<>();
 
-
-    public static WebDriver getDriver(String currentThread) {
+    public static WebDriver getDriver(Thread currentThread) {
         return webDriverMap.get(currentThread);
     }
 
     public static void setDriver(WebDriver driver) {
-        webDriverMap.put(Thread.currentThread().toString(), driver);
+        webDriverMap.put(Thread.currentThread(), driver);
     }
 
     public static void open(String url) {
-        getDriver(Thread.currentThread().toString()).get(url);
+        getDriver(Thread.currentThread()).get(url);
     }
 
     public static <V> V assertThat(ExpectedCondition<V> condition, long timeout) {
-        return new WebDriverWait(getDriver(Thread.currentThread().toString()), timeout).until(condition);
+        return new WebDriverWait(getDriver(Thread.currentThread()), timeout).until(condition);
     }
 
     public static <V> V assertThat(ExpectedCondition<V> condition) {
@@ -76,6 +75,6 @@ public class ConciseAPI {
     }
 
     public static Actions actions() {
-        return new Actions(getDriver(Thread.currentThread().toString()));
+        return new Actions(getDriver(Thread.currentThread()));
     }
 }
