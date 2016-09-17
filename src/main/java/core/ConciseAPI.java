@@ -7,26 +7,30 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
 public class ConciseAPI {
 
-    private static WebDriver driver;
+    private static Map<String, WebDriver> webDriverMap = new HashMap<>();
 
-    public static WebDriver getDriver() {
-        return driver;
+
+    public static WebDriver getDriver(String currentThread) {
+        return webDriverMap.get(currentThread);
     }
 
     public static void setDriver(WebDriver driver) {
-        ConciseAPI.driver = driver;
+        webDriverMap.put(Thread.currentThread().toString(), driver);
     }
 
     public static void open(String url) {
-        getDriver().get(url);
+        getDriver(Thread.currentThread().toString()).get(url);
     }
 
     public static <V> V assertThat(ExpectedCondition<V> condition, long timeout) {
-        return new WebDriverWait(driver, timeout).until(condition);
+        return new WebDriverWait(getDriver(Thread.currentThread().toString()), timeout).until(condition);
     }
 
     public static <V> V assertThat(ExpectedCondition<V> condition) {
@@ -72,6 +76,6 @@ public class ConciseAPI {
     }
 
     public static Actions actions() {
-        return new Actions(getDriver());
+        return new Actions(getDriver(Thread.currentThread().toString()));
     }
 }
