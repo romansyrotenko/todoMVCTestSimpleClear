@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.Quotes;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.HashMap;
@@ -16,8 +17,8 @@ public class ConciseAPI {
 
     private static Map<Thread, WebDriver> webDriverMap = new HashMap<>();
 
-    public static WebDriver getDriver(Thread currentThread) {
-        return webDriverMap.get(currentThread);
+    public static WebDriver getDriver() {
+        return webDriverMap.get(Thread.currentThread());
     }
 
     public static void setDriver(WebDriver driver) {
@@ -25,11 +26,11 @@ public class ConciseAPI {
     }
 
     public static void open(String url) {
-        getDriver(Thread.currentThread()).get(url);
+        getDriver().get(url);
     }
 
     public static <V> V assertThat(ExpectedCondition<V> condition, long timeout) {
-        return new WebDriverWait(getDriver(Thread.currentThread()), timeout).until(condition);
+        return new WebDriverWait(getDriver(), timeout).until(condition);
     }
 
     public static <V> V assertThat(ExpectedCondition<V> condition) {
@@ -60,6 +61,18 @@ public class ConciseAPI {
         return By.linkText(text);
     }
 
+    public static By byText(String text) {
+        return By.xpath(".//*/text()[normalize-space(.) = '" + text + "']/parent::*");
+    }
+
+    public static By byTitle(String text) {
+        return By.xpath(".//*[contains(@title, " + Quotes.escape(text) + ")]");
+    }
+
+    public static By byExactTitle(String text) {
+        return By.xpath(".//*[@" + "title" + '=' + Quotes.escape(text) + ']');
+    }
+
     public static void doubleClick(WebElement element) {
         actions().doubleClick(element).perform();
     }
@@ -75,6 +88,6 @@ public class ConciseAPI {
     }
 
     public static Actions actions() {
-        return new Actions(getDriver(Thread.currentThread()));
+        return new Actions(getDriver());
     }
 }

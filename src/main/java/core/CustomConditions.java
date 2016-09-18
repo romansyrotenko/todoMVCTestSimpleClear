@@ -13,21 +13,18 @@ public class CustomConditions {
 
     public static ExpectedCondition<WebElement> listElementWithCssClass(final By elementsLocator, final String expectedCssClass) {
         return elementExceptionsCatcher(new ExpectedCondition<WebElement>() {
-            List<WebElement> actualElements;
-            List<String> actualCssClassInElements = new ArrayList<>();
-            String currentCssClass;
+            List<String> actualClasses = new ArrayList<>();
 
             public WebElement apply(WebDriver driver) {
-                actualElements = driver.findElements(elementsLocator);
+                List<WebElement> actualElements = driver.findElements(elementsLocator);
 
                 for(int i = 0; i < actualElements.size(); i++) {
-                    WebElement currentElement = actualElements.get(i);
-                    actualCssClassInElements.add(currentElement.getAttribute("class"));
+                    actualClasses.add(actualElements.get(i).getAttribute("class"));
                 }
 
-                for(int i=0; i < actualCssClassInElements.size(); i++) {
-                    currentCssClass = actualCssClassInElements.get(i);
-                    if(isWordContainedInPhrase(currentCssClass, expectedCssClass)) {
+                for(int i=0; i < actualClasses.size(); i++) {
+                    String actualCssClasses = actualClasses.get(i);
+                    if(isWordContainedInPhrase(actualCssClasses, expectedCssClass)) {
                       return actualElements.get(i);
                     }
                 }
@@ -35,8 +32,8 @@ public class CustomConditions {
             }
 
             public String toString() {
-                return String.format("elements of list located ['%s'] should have CSS class ['%s'], while actual classes are ('%s')  "
-                        , elementsLocator.toString(), expectedCssClass, currentCssClass);
+                return String.format("element of list located ['%s'] should have CSS class ['%s'], while actual classes are ('%s')  "
+                        , elementsLocator.toString(), expectedCssClass, actualClasses.toString());
             }
         });
     }
@@ -65,28 +62,22 @@ public class CustomConditions {
 
     public static ExpectedCondition<List<WebElement>> exactTextOf(final By elementsLocator, final String... expectedTexts) {
         return elementExceptionsCatcher(new ExpectedCondition<List<WebElement>>() {
-            private List<String> elementsTexts;
+            private List<String> actualTexts;
 
             public List<WebElement> apply(WebDriver driver) {
-                elementsTexts = new ArrayList<>();
-                List<WebElement> innerElements = driver.findElements(elementsLocator);
-                elementsTexts = getTexts(innerElements);
+                actualTexts = new ArrayList<>();
+                List<WebElement> actualElements = driver.findElements(elementsLocator);
+                actualTexts = getTexts(actualElements);
 
-                if (innerElements.size() != expectedTexts.length) {
+                if(!isContainedInList(actualTexts, expectedTexts)) {
                     return null;
                 }
-
-                for (int i = 0; i < innerElements.size(); i++) {
-                    if (!elementsTexts.get(i).equals(expectedTexts[i])) {
-                        return null;
-                    }
-                }
-                return innerElements;
+                return actualElements;
             }
 
             public String toString() {
                 return String.format("elements of list located ['%s'] should have ('%s') texts, " +
-                                "while actual texts are ('%s')", elementsLocator, Arrays.toString(elementsTexts.toArray()),
+                                "while actual texts are ('%s')", elementsLocator, Arrays.toString(actualTexts.toArray()),
                         Arrays.toString(expectedTexts));
             }
         });
@@ -94,18 +85,14 @@ public class CustomConditions {
 
     public static ExpectedCondition<List<WebElement>> exactTextsOfVisible(final By elementsLocator, final String... expectedTexts) {
         return elementExceptionsCatcher(new ExpectedCondition<List<WebElement>>() {
-            private List<String> elementsTexts;
+            private List<String> actualTexts;
 
             public List<WebElement> apply(WebDriver driver) {
                 List<WebElement> innerElements = driver.findElements(elementsLocator);
-                elementsTexts = getTexts(getVisibleElements(innerElements));
+                actualTexts = getTexts(getVisibleElements(innerElements));
 
- //               isContainedInList(elementsTexts, expectedTexts);
-
-                for (int i = 0; i < elementsTexts.size(); i++) {
-                    if (!elementsTexts.get(i).equals(expectedTexts[i])) {
-                        return null;
-                    }
+                if(!isContainedInList(actualTexts, expectedTexts)) {
+                    return null;
                 }
                 return innerElements;
             }
@@ -113,7 +100,7 @@ public class CustomConditions {
             public String toString() {
                 return String.format("visible elements of list located ['%s'] should have texts ('%s') " +
                         "while actual texts are ('%s')",
-                        elementsLocator, Arrays.toString(elementsTexts.toArray()), Arrays.toString(expectedTexts));
+                        elementsLocator, Arrays.toString(actualTexts.toArray()), Arrays.toString(expectedTexts));
             }
         });
     }
@@ -126,10 +113,7 @@ public class CustomConditions {
             public Boolean apply(WebDriver driver) {
                 actualElements = driver.findElements(elementsLocator);
                 actualElementsSize = actualElements.size();
-                if (actualElementsSize == size) {
-                    return true;
-                }
-                return false;
+                return (actualElementsSize == size);
             }
 
             public String toString() {
@@ -149,10 +133,7 @@ public class CustomConditions {
 
                 List<WebElement> actualVisibleElements = getVisibleElements(actualElements);
                 elementVisibleCount = actualVisibleElements.size();
-                if (elementVisibleCount == size) {
-                    return true;
-                }
-                return false;
+                return (elementVisibleCount == size);
             }
 
             public String toString() {
