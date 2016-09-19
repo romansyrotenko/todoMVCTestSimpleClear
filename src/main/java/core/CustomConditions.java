@@ -46,6 +46,7 @@ public class CustomConditions {
             public WebElement apply(WebDriver driver) {
                 actualElements = driver.findElements(elementsLocator);
                 actualTexts = getTexts(actualElements);
+
                 for (int i = 0; i < actualTexts.size(); i++) {
                     if (actualTexts.get(i).equals(expectedText)) {
                         return actualElements.get(i);
@@ -65,14 +66,13 @@ public class CustomConditions {
             private List<String> actualTexts;
 
             public List<WebElement> apply(WebDriver driver) {
-                actualTexts = new ArrayList<>();
                 List<WebElement> actualElements = driver.findElements(elementsLocator);
                 actualTexts = getTexts(actualElements);
 
-                if(!isContainedInList(actualTexts, expectedTexts)) {
-                    return null;
+                if(areTextsEqual(actualTexts, expectedTexts)) {
+                    return actualElements;
                 }
-                return actualElements;
+                return null;
             }
 
             public String toString() {
@@ -91,10 +91,10 @@ public class CustomConditions {
                 List<WebElement> innerElements = driver.findElements(elementsLocator);
                 actualTexts = getTexts(getVisibleElements(innerElements));
 
-                if(!isContainedInList(actualTexts, expectedTexts)) {
-                    return null;
+                if(areTextsEqual(actualTexts, expectedTexts)) {
+                    return innerElements;
                 }
-                return innerElements;
+                return null;
             }
 
             public String toString() {

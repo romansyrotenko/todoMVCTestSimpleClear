@@ -19,19 +19,13 @@ public class Helpers {
         return false;
     }
 
-    public static boolean isContainedInList(List<String> elementsTexts, String... expectedTexts) {
-
-        List<String> expectedListOfTexts = Arrays.asList(expectedTexts);
-
-        if (!elementsTexts.equals(expectedListOfTexts)) {
-            return false;
-        }
-        return true;
+    public static boolean areTextsEqual(List<String> texts1, String... texts2) {
+        return (texts1.equals(Arrays.asList(texts2)));
     }
 
     public static List<String> getTexts(List<WebElement> webElements) {
         List<String> currentTexts = new ArrayList<>();
-        for (int i = 0; i<webElements.size(); i++) {
+        for (int i = 0; i < webElements.size(); i++) {
             currentTexts.add(webElements.get(i).getText());
         }
         return currentTexts;
