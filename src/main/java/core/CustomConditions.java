@@ -89,11 +89,11 @@ public class CustomConditions {
             private List<String> actualTexts;
 
             public List<WebElement> apply(WebDriver driver) {
-                List<WebElement> innerElements = driver.findElements(elementsLocator);
-                actualTexts = getTexts(getVisibleElements(innerElements));
+                List<WebElement> actualElements = driver.findElements(elementsLocator);
+                actualTexts = getTexts(getVisibleElements(actualElements));
 
                 if(areTextsEqual(actualTexts, expectedTexts)) {
-                    return innerElements;
+                    return actualElements;
                 }
                 return null;
             }
