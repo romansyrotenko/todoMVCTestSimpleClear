@@ -16,6 +16,7 @@ public class CustomConditions {
             List<String> actualClasses = new ArrayList<>();
 
             public WebElement apply(WebDriver driver) {
+                actualClasses.clear();
                 List<WebElement> actualElements = driver.findElements(elementsLocator);
 
                 for(int i = 0; i < actualElements.size(); i++) {
